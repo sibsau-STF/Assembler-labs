@@ -1,3 +1,7 @@
-!msvc
-!x64
-!libusb
+*
+!*/
+!.gitignore
+!msvc/*
+!libusb/*
+!INSTALL_WIN.txt
+!README.md
