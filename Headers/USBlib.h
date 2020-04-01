@@ -3,10 +3,12 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <iomanip>
 using namespace std;
 
 namespace USBlib {
+	namespace USBClass {
+
 /*
 Коды классов USB устройств
 00h - код отсутствует (информацию о классе нужно получать в дескрипторе интерфейса)
@@ -53,51 +55,53 @@ FE	- специфическое устройство
 	};
 
 	//Получает класс подключенного устройства
-	string getUSBClass(USBClass cls) {
+	string parsedUSBClass(USBClass cls) {
 		switch (cls)
 		{
-		case USBlib::None:
+		case USBClass::None:
 			return "No code";
-		case USBlib::Audio:
+		case USBClass::Audio:
 			return "Audio Device";
-		case USBlib::Communication:
+		case USBClass::Communication:
 			return "Communication Device";;
-		case USBlib::HID:
+		case USBClass::HID:
 			return "Human Interface Device";
-		case USBlib::Physical:
+		case USBClass::Physical:
 			return "Physical Device";
-		case USBlib::Image:
+		case USBClass::Image:
 			return "Image Device";
-		case USBlib::Printer:
+		case USBClass::Printer:
 			return "Printer";
-		case USBlib::Storage:
+		case USBClass::Storage:
 			return "Storage";
-		case USBlib::Concentrator:
+		case USBClass::Concentrator:
 			return "Concentrator";
-		case USBlib::CDCdata:
+		case USBClass::CDCdata:
 			return "CDC-Data";
-		case USBlib::SmartCard:
+		case USBClass::SmartCard:
 			return "SmartCard";
-		case USBlib::ContentSecurity:
+		case USBClass::ContentSecurity:
 			return "ContentSecurity";
-		case USBlib::VideoDevice:
+		case USBClass::VideoDevice:
 			return "Video Device";
-		case USBlib::MedicalDevice:
+		case USBClass::MedicalDevice:
 			return "Medical Device";
-		case USBlib::AudioVideoDevice:
+		case USBClass::AudioVideoDevice:
 			return "Audio-Video Device";
-		case USBlib::DiagnosticTool:
+		case USBClass::DiagnosticTool:
 			return "Diagnostic Tool";
-		case USBlib::RemoteController:
+		case USBClass::RemoteController:
 			return "Remote Controller";
-		case USBlib::VariousDevice:
+		case USBClass::VariousDevice:
 			return "Various Device";
-		case USBlib::SpecificDevice:
+		case USBClass::SpecificDevice:
 			return "Specific Device";
 		default:
 			break;
 		}
 	}
+	}
+
 	//Инициализирует libusb
 	libusb_context* libInit() {
 		libusb_device **devices;
@@ -105,7 +109,7 @@ FE	- специфическое устройство
 		int r;          // дл¤ возвращаемых значений
 		r = libusb_init(&context);
 		if (r < 0)
-			throw exception("Ќе удалось инициализировать libusb");
+			throw exception("Не удалось инициализировать libusb");
 		libusb_set_debug(context, 3);
 		return context;
 	}
@@ -122,12 +126,12 @@ FE	- специфическое устройство
 	}
 
 	//Получает дескриптор устройства
-	libusb_device_descriptor getDeviceDescriptor(libusb_device *device) {
+	libusb_device_descriptor deviceDescriptor(libusb_device *device) {
 		libusb_device_descriptor desc;
 		int r = libusb_get_device_descriptor(device, &desc);
 		if (r < 0) {
 			stringstream str = stringstream();
-			str << "ќшибка: не удалось получить дескриптор устройства.  од:";
+			str << "Ошибка: не удалось получить дескриптор устройства. Код:";
 			str << r;
 			throw exception(str.str().c_str());
 		}
@@ -135,12 +139,12 @@ FE	- специфическое устройство
 	}
 
 	//Получает конфигурацию устройства(функци¤ не используетс¤)
-	libusb_config_descriptor* getDeviceConfiguration(libusb_device *device) {
+	libusb_config_descriptor* deviceConfiguration(libusb_device *device) {
 		libusb_config_descriptor *config;
 		int r = r = libusb_get_config_descriptor(device, 0, &config);
 		if (r < 0) {
 			stringstream str = stringstream();
-			str << "ќшибка: конфигураци¤ устройства не получена.  од:";
+			str << "Ошибка: конфигураци¤ устройства не получена. Код:";
 			str << r;
 			throw exception(str.str().c_str());
 		}
@@ -154,7 +158,7 @@ FE	- специфическое устройство
 		if (r != 0)
 		{
 			stringstream str = stringstream();
-			str << "ќшибка: не удаЄтс¤ получить доступ к устройству.  од:";
+			str << "Ошибка: не удаЄтс¤ получить доступ к устройству. Код:";
 			str << r;
 			throw exception(str.str().c_str());
 		}
@@ -166,11 +170,11 @@ FE	- специфическое устройство
 	}
 
 	//Получает сведени¤ об устройстве
-	string deviceToString(libusb_device *device) {
+	string deviceDescription(libusb_device *device) {
 		libusb_device_descriptor desc; // дескриптор устройства
 		try
 		{
-			desc = getDeviceDescriptor(device);
+			desc = deviceDescriptor(device);
 		}
 		catch (const std::exception& e)
 		{
@@ -178,9 +182,9 @@ FE	- специфическое устройство
 		}
 
 		stringstream str = stringstream();
-		str << "USB Class: \t"<<getUSBClass((USBClass)desc.bDeviceClass) << "(0x" << uppercase << hex << (USBClass)desc.bDeviceClass << ")\n";
-		str << "Vendor id:\t0x"<<uppercase <<hex << desc.idVendor << endl;
-		str << "Product id:\t0x" << uppercase <<hex << desc.idProduct <<endl;
+		str << "USB Class: \t" << USBClass::parsedUSBClass((USBClass::USBClass)desc.bDeviceClass) << "(0x" << uppercase << hex << setprecision(2) << (USBClass)desc.bDeviceClass << ")\n";
+		str << "Vendor id:\t0x" << uppercase << hex << setprecision(4) << desc.idVendor << endl;
+		str << "Product id:\t0x" << uppercase << hex << setprecision(4) << desc.idProduct << endl;
 		try
 		{
 			str << "Serial:\t" << uppercase << deviceSerialNum(device) << endl;

@@ -18,7 +18,7 @@ int main() {
 	cout << "Device count: " << cnt << endl;
 	//вывожу данные об устройствах
 	for (ssize_t i = 0; i < cnt; i++)
-		cout << USBlib::deviceToString(devices[i]) << endl;
+		cout << USBlib::deviceDescription(devices[i]) << endl;
 
 	USBlib::libExit(context, devices);
 	system("pause");
