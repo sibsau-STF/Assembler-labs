@@ -138,13 +138,13 @@ FE	- специфическое устройство
 		return desc;
 	}
 
-	//Получает конфигурацию устройства(функци¤ не используетс¤)
+	//Получает конфигурацию устройства(функци¤ не используется)
 	libusb_config_descriptor* deviceConfiguration(libusb_device *device) {
 		libusb_config_descriptor *config;
 		int r = r = libusb_get_config_descriptor(device, 0, &config);
 		if (r < 0) {
 			stringstream str = stringstream();
-			str << "Ошибка: конфигураци¤ устройства не получена. Код:";
+			str << "Ошибка: конфигурация устройства не получена. Код:";
 			str << r;
 			throw exception(str.str().c_str());
 		}
@@ -154,22 +154,24 @@ FE	- специфическое устройство
 	//Позвращает серийный номер устройства
 	string deviceSerialNum(libusb_device *device) {
 		libusb_device_handle *handler;
-		int r = libusb_open(device, &handler);
-		if (r != 0)
+		libusb_device_descriptor desc;
+		int r = libusb_get_device_descriptor(device, &desc);
+		r = libusb_open(device, &handler);
+		if (r != LIBUSB_SUCCESS)
 		{
 			stringstream str = stringstream();
-			str << "Ошибка: не удаЄтс¤ получить доступ к устройству. Код:";
+			str << "Ошибка: не удаётся получить доступ к устройству. Код:";
 			str << r;
 			throw exception(str.str().c_str());
 		}
 		unsigned char* data = new unsigned char[256];
 		size_t length=0;
 		//получаю строковое представление серийника
-		libusb_get_string_descriptor_ascii(handler, 0, data, length);
+		libusb_get_string_descriptor_ascii(handler, desc.iSerialNumber, data, length);
 		return string((char*)data, length);
 	}
 
-	//Получает сведени¤ об устройстве
+	//Получает сведения об устройстве
 	string deviceDescription(libusb_device *device) {
 		libusb_device_descriptor desc; // дескриптор устройства
 		try
@@ -182,7 +184,7 @@ FE	- специфическое устройство
 		}
 
 		stringstream str = stringstream();
-		str << "USB Class: \t" << USBClass::parsedUSBClass((USBClass::USBClass)desc.bDeviceClass) << "(0x" << uppercase << hex << setprecision(2) << (USBClass)desc.bDeviceClass << ")\n";
+		str << "USB Class: \t" << USBClass::parsedUSBClass((USBClass::USBClass)desc.bDeviceClass) << "(0x" << uppercase << hex << setprecision(2) << (USBClass::USBClass)desc.bDeviceClass << ")\n";
 		str << "Vendor id:\t0x" << uppercase << hex << setprecision(4) << desc.idVendor << endl;
 		str << "Product id:\t0x" << uppercase << hex << setprecision(4) << desc.idProduct << endl;
 		try
