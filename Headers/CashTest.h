@@ -1,10 +1,9 @@
 #pragma once
-	#include<omp.h>
-	#include<stdio.h>
-	#include<stdlib.h>
-	#include<iostream>
-	#include<random>
-	#include<vector>
+#include<stdio.h>
+#include<iostream>
+#include<random>
+#include<vector>
+#include<time.h>
 
 namespace hash {
 	using std::vector;
@@ -25,25 +24,37 @@ namespace hash {
 
 	// Выполняет один проход по циклическому списку
 	// Возвращает количество тактов затраченное на проход
-	double runSequence(int*& sec, size_t& length) {
-		double time = omp_get_wtime();
+	clock_t runSequence(int*& sec, size_t length) {
+		clock_t time = clock();
 		for (size_t i = 0, j = 0; i < length; i++)
 			j = sec[j];
-		return (omp_get_wtime() - time) / omp_get_wtick();
+		clock_t fin = clock();
+		clock_t res = fin - time;
+
+		//std::cout << "start: " << time << "\t";
+		//std::cout << "fin: " << fin << "\t";
+		//std::cout << "res: " << res << std::endl;
+
+		return res;
 	}
 
 	// Вычисляет минимальное количество тактов процессора требуемое для прохода пол циклическому списку.
 	// count - количество проходом
 	// data - циклический список
 	// length - длина
-	long minimumTime(size_t count, int*& data, size_t& length) {
-		double tmp = 0;
-		double min_time = runSequence(data, length);
+	clock_t minimumTime(size_t count, int*& data, size_t length) {
+		clock_t tmp = 0;
+		//std::cout << "Repeat " << count << ";times\n";
+
+		clock_t min_time = runSequence(data, length);
 		for (size_t i = 0; i < count-1; i++)
 		{
 			tmp = runSequence(data, length);
 			min_time = (tmp < min_time) ? tmp : min_time;
 		}
+
+		//std::cout << "End Repeat\n";
+		//std::cout << std::endl;
 		return min_time;
 	}
 
