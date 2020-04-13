@@ -80,7 +80,7 @@ namespace hash {
 	//[Долго выполняется]
 	// length - длина
 	int* randomSequence(size_t length) {
-		int* arr = new int[length]();
+		int* arr = new int[length];
 		int min = 0, max = length-1;
 		int iter = 0, tmp = 0;
 
@@ -107,7 +107,7 @@ namespace hash {
 	//Псевдослучайный циклический список
 	// length - длина
 	int* semiRandomSequence(size_t length) {
-		int* arr = new int[length]();
+		int* arr = new int[length];
 		int iter;
 		int seqTemplate[5] = { 2, 3, 1, 4, 5 };
 
