@@ -4,12 +4,12 @@
 #include <fstream>
 #include <iomanip>
 
-#define CACHE_SIZE	(8 * 1024 * 1024)						// Размер кэш-памяти					(В Byte)		(Используется 8 Mb)
-#define TYPE_SIZE	(4)										// Тип данных							(В Byte)		(Используется int (4 byte))
-#define FRAG_COUNT	(32)									// Число фрагментов						(Количество)	(Используется 32)
-#define FRAG_OFFSET	(CACHE_SIZE / TYPE_SIZE)				// Растояние между началами фрагментов	(Количество)
+#define CACHE_SIZE	(8 * 1024 * 1024)			// Размер кэш-памяти					(В Byte)		(Используется 8 Mb)
+#define TYPE_SIZE	(4)					// Тип данных							(В Byte)		(Используется int (4 byte))
+#define FRAG_COUNT	(32)					// Число фрагментов						(Количество)	(Используется 32)
+#define FRAG_OFFSET	(CACHE_SIZE / TYPE_SIZE)		// Растояние между началами фрагментов	(Количество)
 #define FRAG_SIZE	(CACHE_SIZE / FRAG_COUNT / TYPE_SIZE)	// Размер фрагмента						(Количество)
-#define ARR_SIZE	(FRAG_COUNT * FRAG_OFFSET)				// Размер массива						(Количество)
+#define ARR_SIZE	(FRAG_COUNT * FRAG_OFFSET)		// Размер массива						(Количество)
 
 //Функция подготовки массива
 void prepareArr(int *arr, int size)
