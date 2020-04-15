@@ -1,0 +1,7 @@
+*
+!*/
+!.gitignore
+!msvc/*
+!libusb/*
+!INSTALL_WIN.txt
+!README.md
