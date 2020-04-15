@@ -4,6 +4,8 @@
 #include<random>
 #include<vector>
 #include<time.h>
+#include <vector>
+#include <algorithm>
 
 namespace hash {
 	using std::vector;
@@ -101,6 +103,22 @@ namespace hash {
 			arr[iter] = tmp;
 			iter = tmp;
 		}
+		return arr;
+	}
+
+	//Случайный циклический список 2
+	//[Выполняется быстрей]
+	// length - длина
+	int* randomSequence2(size_t length) {
+		int* arr = new int[length];
+		std::vector<int> x(length);
+		for (int i = 0; i < length; i++) {
+			x[i] = i;
+		}
+		srand(unsigned(time(0)));
+		std::random_shuffle(x.begin(), x.end());
+		for (int i = 0; i < length; i++)
+			arr[i] = x[i];
 		return arr;
 	}
 
