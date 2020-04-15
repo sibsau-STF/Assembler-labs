@@ -1,8 +1,16 @@
-#include <omp.h>
 #include <conio.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+
+// Закоментировать для использования для замера времени omp.h вместо time.h
+#define TIME_H
+
+#ifdef TIME_H
+#include <time.h>
+#else
+#include <omp.h>
+#endif // TIME_H
 
 #define CACHE_SIZE	(8 * 1024 * 1024)						// Размер кэш-памяти					(В Byte)		(Используется 8 Mb)
 #define TYPE_SIZE	(4)										// Тип данных							(В Byte)		(Используется int (4 byte))
@@ -48,13 +56,21 @@ int main()
 		double temp_time = 0;
 		for (int i = 0; i >= 0 && i < frag * FRAG_OFFSET;)
 		{
+#ifdef TIME_H
+			temp_time -= clock();
+#else
 			temp_time -= omp_get_wtime();
+#endif // TIME_H
 			i = arr[i];
+#ifdef TIME_H
+			temp_time += clock();
+#else
 			temp_time += omp_get_wtime();
+#endif // TIME_H
 		}
 		temp_time /= (frag * FRAG_OFFSET);
-		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(20) << temp_time << std::endl;
-		outputFile << frag << ";\t" << std::fixed << std::setprecision(20) << temp_time << std::endl;
+		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(18) << temp_time << std::endl;
+		outputFile << frag << ";" << std::fixed << std::setprecision(18) << temp_time << std::endl;
 		delete[]arr;
 	}
 	outputFile.close();
