@@ -3,18 +3,12 @@
 #include <fstream>
 #include <iomanip>
 
-// Закоментировать для использования для замера времени omp.h вместо time.h
-//#define TIME_H
 // Для использования различных реализаций - закоментировать нужное:
 #define USE_OMP		// Использовать для замеров времени omp_get_wtime() (omp.h) вместо clock() (time.h)
 #define EXP_MIN		// В ходе замеров брать минимальное значение вместо среднего
 
-#ifdef TIME_H
-#include <time.h>
-#else
 #ifdef USE_OMP
 #include <omp.h>
-#endif // TIME_H
 #else
 #include <time.h>
 #endif // USE_OMP
@@ -62,17 +56,9 @@ int main()
 	{
 		int *arr = new int[frag * FRAG_OFFSET];
 		prepareArr(arr, frag * FRAG_OFFSET);
-#ifdef TIME_H
-		double temp_time = -clock();
 #ifdef EXP_MIN
 		double time = 1;
 #else
-		double temp_time = -omp_get_wtime();
-#endif // TIME_H
-		for (int i = 0; i >= 0 && i < frag * FRAG_OFFSET;)
-			i = arr[i];
-#ifdef TIME_H
-		temp_time += clock();
 		double time = 0;
 #endif // EXP_MIN
 		for (int ex = 0; ex < EXP_COUNT; ex++)
@@ -87,11 +73,6 @@ int main()
 #ifdef USE_OMP
 			temp_time += omp_get_wtime();
 #else
-		temp_time += omp_get_wtime();
-#endif // TIME_H
-		temp_time /= (frag * FRAG_SIZE);
-		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(18) << temp_time << std::endl;
-		outputFile << frag << ";" << std::fixed << std::setprecision(18) << temp_time << std::endl;
 			temp_time += clock();
 #endif // USE_OMP
 #ifdef EXP_MIN
