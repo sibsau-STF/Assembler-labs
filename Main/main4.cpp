@@ -53,21 +53,18 @@ int main()
 	{
 		int *arr = new int[frag * FRAG_OFFSET];
 		prepareArr(arr, frag * FRAG_OFFSET);
-		double temp_time = 0;
-		for (int i = 0; i >= 0 && i < frag * FRAG_OFFSET;)
-		{
 #ifdef TIME_H
-			temp_time -= clock();
+			double temp_time = -clock();
 #else
-			temp_time -= omp_get_wtime();
+			double temp_time = -omp_get_wtime();
 #endif // TIME_H
+		for (int i = 0; i >= 0 && i < frag * FRAG_OFFSET;)
 			i = arr[i];
 #ifdef TIME_H
 			temp_time += clock();
 #else
 			temp_time += omp_get_wtime();
 #endif // TIME_H
-		}
 		temp_time /= (frag * FRAG_OFFSET);
 		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(18) << temp_time << std::endl;
 		outputFile << frag << ";" << std::fixed << std::setprecision(18) << temp_time << std::endl;
