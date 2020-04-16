@@ -5,13 +5,21 @@
 
 // Закоментировать для использования для замера времени omp.h вместо time.h
 //#define TIME_H
+// Для использования различных реализаций - закоментировать нужное:
+#define USE_OMP		// Использовать для замеров времени omp_get_wtime() (omp.h) вместо clock() (time.h)
+#define EXP_MIN		// В ходе замеров брать минимальное значение вместо среднего
 
 #ifdef TIME_H
 #include <time.h>
 #else
+#ifdef USE_OMP
 #include <omp.h>
 #endif // TIME_H
+#else
+#include <time.h>
+#endif // USE_OMP
 
+#define EXP_COUNT	(200)									// Количество замеров					(Количество)	(Используется 200)
 #define CACHE_SIZE	(8 * 1024 * 1024)						// Размер кэш-памяти					(В Byte)		(Используется 8 Mb)
 #define TYPE_SIZE	(4)										// Тип данных							(В Byte)		(Используется int (4 byte))
 #define FRAG_COUNT	(32)									// Число фрагментов						(Количество)	(Используется 32)
@@ -40,6 +48,7 @@ void prepareArr(int *arr, int size)
 int main()
 {
 	std::cout << "\nInfo:" << std::endl;
+	std::cout << " Number of experiments. . : " << EXP_COUNT << std::endl;
 	std::cout << " Cache size . . . . . . . : " << CACHE_SIZE << " b (" << CACHE_SIZE / (1024.0 * 1024.0) << " Mb)" << std::endl;
 	std::cout << " Data type size . . . . . : " << TYPE_SIZE << " b" << std::endl;
 	std::cout << " Number of fragments. . . : " << FRAG_COUNT << std::endl;
@@ -55,6 +64,8 @@ int main()
 		prepareArr(arr, frag * FRAG_OFFSET);
 #ifdef TIME_H
 		double temp_time = -clock();
+#ifdef EXP_MIN
+		double time = 1;
 #else
 		double temp_time = -omp_get_wtime();
 #endif // TIME_H
@@ -62,12 +73,38 @@ int main()
 			i = arr[i];
 #ifdef TIME_H
 		temp_time += clock();
+		double time = 0;
+#endif // EXP_MIN
+		for (int ex = 0; ex < EXP_COUNT; ex++)
+		{
+#ifdef USE_OMP
+			double temp_time = -omp_get_wtime();
+#else
+			double temp_time = -clock();
+#endif // USE_OMP
+			for (int i = 0; i >= 0 && i < frag * FRAG_OFFSET;)
+				i = arr[i];
+#ifdef USE_OMP
+			temp_time += omp_get_wtime();
 #else
 		temp_time += omp_get_wtime();
 #endif // TIME_H
 		temp_time /= (frag * FRAG_SIZE);
 		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(18) << temp_time << std::endl;
 		outputFile << frag << ";" << std::fixed << std::setprecision(18) << temp_time << std::endl;
+			temp_time += clock();
+#endif // USE_OMP
+#ifdef EXP_MIN
+			time = fmin(time, temp_time / (frag * FRAG_SIZE));
+#else
+			time += temp_time / (frag * FRAG_SIZE);
+#endif // EXP_MIN
+		}
+#ifndef EXP_MIN
+		time /= EXP_COUNT;
+#endif // EXP_MIN
+		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(18) << time << std::endl;
+		outputFile << frag << ";" << std::fixed << std::setprecision(18) << time << std::endl;
 		delete[]arr;
 	}
 	outputFile.close();
