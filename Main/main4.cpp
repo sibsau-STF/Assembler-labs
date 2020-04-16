@@ -61,9 +61,9 @@ int main()
 		for (int i = 0; i >= 0 && i < frag * FRAG_OFFSET;)
 			i = arr[i];
 #ifdef TIME_H
-			temp_time += clock();
+		temp_time += clock();
 #else
-			temp_time += omp_get_wtime();
+		temp_time += omp_get_wtime();
 #endif // TIME_H
 		temp_time /= (frag * FRAG_SIZE);
 		std::cout << " " << frag << ";\t" << std::fixed << std::setprecision(18) << temp_time << std::endl;
