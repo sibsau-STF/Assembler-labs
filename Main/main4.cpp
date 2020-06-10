@@ -51,7 +51,7 @@ int main()
 	std::cout << " Max array size . . . . . : " << ARR_SIZE << " (" << ARR_SIZE * TYPE_SIZE << " b)\n" << std::endl;
 	std::cout << "Results:" << std::endl;
 	std::cout << " [fragments];\t[time]" << std::endl;
-	std::ofstream outputFile("results.txt");
+	std::ofstream outputFile("results.csv");
 	for (int frag = 1; frag <= FRAG_COUNT; frag++)
 	{
 		int *arr = new int[frag * FRAG_OFFSET];
